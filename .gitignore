@@ -9,11 +9,27 @@ wheels/
 # Virtual environments
 .venv
 
-# Models
+# Model weights (published separately as a GitHub Release / download link)
 *.pt
+*.pth
+*.onnx
+*.safetensors
+*.ckpt
+weights/
+
+# Training outputs: checkpoints, plots, logs
+runs/
 
 # Media files
 *.png
 *.jpg
 *.jpeg
 *.webp
+*.mp4
+*.mov
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
