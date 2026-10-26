@@ -1,0 +1,228 @@
+﻿folder,brand,maker,model,body,images,excluded_because
+0005,BMW,BMW,M5,Sedan,164,
+0007,BYD,BYD,Dolphin,Sedan,173,
+0012,Mercedes,Mercedes-Benz,CLS AMG,Sedan,26,
+0015,BMW,BMW,6 Series GT,Sedan,180,
+0019,Geely,Geely,Star Rui,Sedan,186,
+0020,BMW,BMW,M4,Sedan,179,
+0026,BMW,BMW,5 Series PHEV,Sedan,135,
+0041,Geely,Geely,Haoyue L,SUV,156,
+0046,,Changan Kaicheng,Ruixing M70,Bus,119,not a target brand
+0047,Geely,Geely,Star Yue L,SUV,188,
+0051,,Changan Kuayue,Kuayue Star V5 EV,Van,141,not a target brand
+0057,Mercedes,Mercedes-Benz,Mercedes-Benz G-Class,SUV,175,
+0058,BYD,BYD,e9,Sedan,101,
+0059,Mercedes,Mercedes-Benz,GLC AMG,SUV,172,
+0063,BMW,BMW,BMW 3 Series,Sedan,176,
+0068,Chery,Chery,Tiggo 8 PLUS Kunpeng e+,SUV,154,
+0069,Geely,Geely,Emgrand L HiP,Sedan,133,
+0076,Chery,Chery,Tiggo 7 PLUS,SUV,181,
+0078,,Changan Kaicheng,Ruixing M80,Bus,151,not a target brand
+0083,,Changan Oushang,Changan Oushang Z6,SUV,130,not a target brand
+0087,Mercedes,Mercedes-Benz,EQS SUV,SUV,140,
+0088,Changan,Changan,Eado EV,Sedan,173,
+0094,Jetour,Jetour,Jetour Traveler,SUV,124,
+0097,Jetour,Jetour,X90,SUV,163,
+0101,BMW,BMW,BMW i3,Sedan,148,
+0102,BMW,BMW,i7,Sedan,119,
+0104,Mercedes,Mercedes-Benz,E-Class AMG,Sedan,119,
+0109,Mercedes,Mercedes-Benz,Mercedes-Benz Vito,MPV,137,
+0111,BYD,BYD,Destroyer 05,Sedan,179,
+0113,Haval,Haval,Haval Big Dog 2nd Gen,SUV,97,
+0116,Chery,Chery,Arrizo 5,Sedan,155,
+0120,BMW,BMW,BMW X5,SUV,185,
+0122,BYD,BYD,Seal,Sedan,123,
+0125,,Geely Galaxy,Galaxy L7,SUV,96,not a target brand
+0130,,Changan Kuayue,Kuayue Star V5,Van,112,not a target brand
+0132,Changan,Changan,Changan UNI-K,SUV,151,
+0139,Mercedes,Mercedes-Benz,Mercedes-Benz A-Class,Sedan,172,
+0140,Chevrolet,Chevrolet,Trailblazer,SUV,191,
+0146,Mercedes,Mercedes-Benz,GLA AMG,SUV,164,
+0152,Mercedes,Mercedes-Benz,EQE SUV,SUV,111,
+0153,,Changan Kaicheng,Shenqi T30,Truck,127,not a target brand
+0159,Mercedes,Mercedes-Benz,Mercedes-Benz S-Class,Sedan,176,
+0164,Mercedes,Mercedes-Benz,Maybach S-Class,Sedan,187,
+0170,Mercedes,Mercedes-Benz,S-Class PHEV,Sedan,67,
+0171,BYD,BYD,Yuan Pro,SUV,125,
+0172,BYD,BYD,e2,Sedan,182,
+0175,Mercedes,Mercedes-Benz,E-Class PHEV,Sedan,154,
+0176,Haval,Haval,Haval Cool Dog,SUV,162,
+0182,Mercedes,Mercedes-Benz,Maybach GLS,SUV,185,
+0190,Chery,Chery,Tiggo 8 PRO,SUV,138,
+0192,BYD,BYD,Tang DM,SUV,192,
+0193,Changan,Changan,Changan CS35 PLUS,SUV,189,
+0200,BMW,BMW,X6,SUV,185,
+0210,,Changan Kaicheng,Ouno S,Van,178,not a target brand
+0218,Changan,Changan,Changan UNI-T,SUV,180,
+0222,BMW,BMW,BMW X7,SUV,193,
+0243,,Geely Geometry,Geely Geometry M6,SUV,53,not a target brand
+0248,Zeekr,Zeekr,Zeekr 009,MPV,18,
+0253,,Changan Kaicheng,Ruixing EM60,Van,75,not a target brand
+0254,,Changan Kaicheng,Changan Star Truck PLUS,Truck,58,not a target brand
+0261,Haval,Haval,Haval H5,SUV,187,
+0270,Changan,Changan,CS75 PLUS iDD,SUV,75,
+0271,,Chery,Omoda,SUV,168,Chery Omoda: sold under its own OMODA badge in Uzbekistan
+0272,Changan,Changan,Changan CS75 PLUS,SUV,165,
+0273,,Changan Kaicheng,Changan Star 9,Van,156,not a target brand
+0276,Haval,Haval,Haval M6,SUV,183,
+0281,BMW,BMW,BMW 1 Series,Sedan,187,
+0282,Mercedes,Mercedes-Benz,Mercedes-Benz EQE,Sedan,170,
+0283,Chery,Chery,Arrizo 5 PLUS,Sedan,166,
+0284,BMW,BMW,BMW X4 M,SUV,113,
+0287,Chery,Chery,Tiggo 3x,SUV,186,
+0294,,Changan Oushang,Changan Oushang Z6 iDD New Energy,SUV,112,not a target brand
+0296,Jetour,Jetour,Jetour X70,SUV,160,
+0302,Geely,Geely,Vision X6,SUV,153,
+0304,BMW,BMW,BMW X4,SUV,179,
+0310,Changan,Changan,Eado,Sedan,186,
+0311,,Changan Kuayue,Kuayue King X1 EV,Truck,162,not a target brand
+0316,Chery,Chery,Tiggo 9,SUV,21,
+0317,Mercedes,Mercedes-Benz,AMG GT,Sports Car,176,
+0321,Changan,Changan,Eado DT,Sedan,170,
+0322,BYD,BYD,Qin EV,Sedan,107,
+0324,,Changan Kaicheng,Shenqi T20,Truck,148,not a target brand
+0326,Mercedes,Mercedes-Benz,Mercedes-Benz GLC Coupe AMG,SUV,71,
+0327,Mercedes,Mercedes-Benz,C-Class PHEV,Sedan,53,
+0335,Mercedes,Mercedes-Benz,GLB AMG,SUV,155,
+0337,Jetour,Jetour,Jetour X90 PLUS,SUV,128,
+0342,Changan,Changan,Changan CS15,SUV,182,
+0350,BMW,BMW,BMW 2 Series,Sedan,176,
+0354,Mercedes,Mercedes-Benz,CLA AMG,Sedan,173,
+0356,Chery,Chery,Tiggo 5x,SUV,183,
+0358,Changan,Changan,Changan CS55 PLUS,SUV,163,
+0360,BMW,BMW,BMW 7 Series,Sedan,162,
+0362,Mercedes,Mercedes-Benz,Mercedes-Benz A-Class AMG,Sedan,185,
+0363,BYD,BYD,Song Pro DM-i,SUV,162,
+0370,BMW,BMW,BMW iX3,SUV,145,
+0374,Changan,Changan,Changan UNI-V,Sedan,181,
+0389,BYD,BYD,Qin PLUS DM-i,Sedan,152,
+0392,Mercedes,Mercedes-Benz,GLS AMG,SUV,138,
+0396,BMW,BMW,XM,SUV,118,
+0397,Changan,Changan,CS95,SUV,163,
+0401,Changan,Changan,UNI-K iDD,SUV,102,
+0404,BMW,BMW,BMW X1,SUV,155,
+0409,Changan,Changan,Raeton CC,Sedan,178,
+0424,BMW,BMW,BMW X3 M,SUV,103,
+0430,,Mercedes-Maybach,S-Class PHEV,Sedan,93,not a target brand
+0432,Mercedes,Mercedes-Benz,Mercedes-Benz GLE,SUV,197,
+0437,BYD,BYD,BYD D1,MPV,164,
+0440,Mercedes,Mercedes-Benz,B-Class,Sedan,142,
+0441,BMW,BMW,M3,Sedan,185,
+0443,Mercedes,Mercedes-Benz,EQB,SUV,130,
+0445,Mercedes,Mercedes-Benz,Mercedes-Benz CLA,Sedan,184,
+0447,Haval,Haval,Jolion,SUV,105,
+0449,Mercedes,Mercedes-Benz,Mercedes-Benz SL-Class AMG,Sports Car,183,
+0450,Geely,Geely,Star L ER-EV,SUV,151,
+0454,Chery,Chery,Tiggo 8,SUV,120,
+0461,Geely,Geely,Geely ICON,SUV,169,
+0463,Haval,Haval,H6 New Energy,SUV,35,
+0466,,Changan Kaicheng,Kaicheng F300,Truck,100,not a target brand
+0468,Haval,Haval,Haval H6,SUV,188,
+0471,Changan,Changan,CS85 COUPE,SUV,180,
+0473,Geely,Geely,Bo Yue,SUV,184,
+0477,Haval,Haval,Divine Beast,SUV,164,
+0480,BMW,BMW,BMW Z4,Sports Car,193,
+0487,BMW,BMW,BMW 8 Series,Sedan,154,
+0495,Mercedes,Mercedes-Benz,GLE Coupe,SUV,107,
+0504,Zeekr,Zeekr,Zeekr X,SUV,96,
+0514,,Changan Kuayue,Kuayue King X1,Truck,155,not a target brand
+0521,,Changan Oushang,BenBen E-Star,Sedan,143,not a target brand
+0528,Changan,Changan,Eado,Sedan,122,
+0531,BMW,BMW,iX1,SUV,65,
+0534,Changan,Changan,Changan UNI-V iDD,Sedan,113,
+0550,,Changan Kaicheng,Shenqi T10 EV,Truck,112,not a target brand
+0553,,Changan Kaicheng,Changan Shenqi PLUS,Truck,38,not a target brand
+0555,Haval,Haval,Haval H9,SUV,197,
+0562,Mercedes,Mercedes-Benz,EQS,Sedan,167,
+0568,Geely,Geely,Emgrand,Sedan,164,
+0574,,Geely Galaxy,Galaxy L6,Sedan,103,not a target brand
+0575,Changan,Changan,Changan CS75,SUV,137,
+0576,Haval,Haval,Haval Chitu,SUV,177,
+0580,Mercedes,Mercedes-Benz,G-Class AMG,SUV,127,
+0582,BMW,BMW,BMW 5 Series,Sedan,185,
+0587,Mercedes,Mercedes-Benz,Mercedes-Benz GLA,SUV,184,
+0596,Chevrolet,Chevrolet,Menlo,Sedan,161,
+0600,BYD,BYD,Song MAX DM-i,MPV,148,
+0603,,Changan Kuayue,Kuayue Star V3,Van,78,not a target brand
+0606,BYD,BYD,Yuan PLUS,SUV,171,
+0608,Zeekr,Zeekr,Zeekr 001,Sedan,164,
+0609,BMW,BMW,i4,Sedan,178,
+0610,Mercedes,Mercedes-Benz,EQC,SUV,154,
+0613,BMW,BMW,M8,Sedan,183,
+0618,,Changan Kaicheng,Changan Star 5,Van,60,not a target brand
+0623,BYD,BYD,e3,Sedan,167,
+0627,Chevrolet,Chevrolet,Malibu XL,Sedan,192,
+0633,Chevrolet,Chevrolet,Camaro,SUV,110,
+0634,Haval,Haval,H6S,SUV,143,
+0636,,Changan Oushang,Changan Oushang X7 PLUS,SUV,137,not a target brand
+0649,Mercedes,Mercedes-Benz,GLC Coupe,SUV,182,
+0652,Mercedes,Mercedes-Benz,Mercedes-Benz GLB,SUV,161,
+0660,Chery,Chery,Tiggo 7,SUV,136,
+0661,Geely,Geely,Emgrand S,SUV,46,
+0671,BMW,BMW,M2,Sedan,192,
+0683,BMW,BMW,BMW X3,SUV,172,
+0688,Mercedes,Mercedes-Benz,Mercedes-Benz C-Class,Sedan,184,
+0695,,Chery New Energy,QQ Ice Cream,Sedan,144,not a target brand
+0703,BYD,BYD,M3,MPV,117,
+0706,BMW,BMW,X5 M,SUV,34,
+0712,Chery,Chery,Tiggo 8 PRO PHEV,SUV,87,
+0716,BYD,BYD,Seagull,Sedan,119,
+0727,Mercedes,Mercedes-Benz,Mercedes-Benz E-Class,Sedan,195,
+0738,Jetour,Jetour,Jetour X70 PLUS,SUV,148,
+0742,Chevrolet,Chevrolet,Cruze,Sedan,195,
+0743,Haval,Haval,Haval Big Dog,SUV,194,
+0749,,Changan Kuayue,New Leopard T1,Truck,37,not a target brand
+0752,Chery,Chery,Arrizo 5 GT,Sedan,15,
+0759,Mercedes,Mercedes-Benz,Mercedes-Benz CLS,Sedan,194,
+0763,Chevrolet,Chevrolet,Equinox,SUV,188,
+0769,,Changan Oushang,Changan Oushang X5,SUV,182,not a target brand
+0770,BMW,BMW,X6 M,SUV,166,
+0773,Geely,Geely,Jiaji,MPV,176,
+0787,,Changan,Changan F70,Truck,178,commercial (Truck)
+0792,,Changan Kaicheng,Changan Star Truck C Series,Truck,40,not a target brand
+0796,Mercedes,Mercedes-Benz,Mercedes-Benz V-Class,MPV,131,
+0798,,Changan Kaicheng,Changan Star 9 EV,Van,115,not a target brand
+0805,BYD,BYD,Tang EV,SUV,160,
+0808,Geely,Geely,Binrui,Sedan,183,
+0824,,Geely Geometry,Geely Geometry E Firefly,SUV,109,not a target brand
+0837,Mercedes,Mercedes-Benz,C-Class AMG,Sedan,188,
+0838,Jetour,Jetour,Jetour Dasheng,SUV,166,
+0844,Chery,Chery,Tiggo 8 PLUS,SUV,143,
+0863,Chery,Chery,Tiggo 6,SUV,30,
+0866,BMW,BMW,iX,SUV,148,
+0869,,Changan Kaicheng,Ruixing EM80,Van,27,not a target brand
+0870,BMW,BMW,BMW 4 Series,Sedan,187,
+0872,Jetour,Jetour,Daisheng i-DM,SUV,146,
+0875,,Changan Kaicheng,Rui Xing M60,Van,147,not a target brand
+0880,,Changan Kuayue,New Leopard T3,Truck,153,not a target brand
+0883,Changan,Changan,Raeton PLUS,Sedan,115,
+0884,BYD,BYD,Song PLUS DM-i,SUV,174,
+0885,BYD,BYD,Frigate 07,SUV,160,
+0887,,Changan Kuayue,Kuayue D5,Truck,131,not a target brand
+0889,,Chery New Energy,Little Ant,Sedan,169,not a target brand
+0890,,Changan,Explorer,Truck,168,commercial (Truck)
+0893,,Chery New Energy,Boundary Pro,Sedan,157,not a target brand
+0896,,Changan Qiyuan,Changan Qiyuan A07,Sedan,107,not a target brand
+0901,Jetour,Jetour,X70 PRO,SUV,27,
+0906,BMW,BMW,7 Series PHEV,Sedan,137,
+0918,,Changan Kuayue,Kuayue King X3,Truck,144,not a target brand
+0920,BYD,BYD,Seal DM-i,Sedan,54,
+0921,Changan,Changan,Changan Lumin,Sedan,137,
+0925,Geely,Geely,Panda,Sedan,141,
+0934,BYD,BYD,Han EV,Sedan,191,
+0935,BYD,BYD,Song PLUS EV,SUV,116,
+0936,Mercedes,Mercedes-Benz,Mercedes-Benz GLC,SUV,186,
+0940,,Changan Oushang,Changan Oushang X5 PLUS,SUV,46,not a target brand
+0943,Chery,Chery,Arrizo 8,Sedan,114,
+0947,Chery,Chery,Tiggo 7 PLUS PHEV,SUV,39,
+0951,Haval,Haval,Haval Jolion MAX,SUV,138,
+0958,Mercedes,Mercedes-Benz,Mercedes-Benz GLS,SUV,185,
+0966,BYD,BYD,Han DM,Sedan,119,
+0967,,Changan Kuayue,Kuayue King X5,Truck,118,not a target brand
+0968,Geely,Geely,Binyue,SUV,183,
+0977,BMW,BMW,BMW X2,SUV,179,
+0979,Chevrolet,Chevrolet,Trax,SUV,183,
+0989,BYD,BYD,Qin PLUS EV,Sedan,114,
+0990,Mercedes,Mercedes-Benz,GLE AMG,SUV,121,
+0993,,Changan Kaicheng,Changan Star Truck,Truck,14,not a target brand
+0998,Haval,Haval,Haval Big Dog 2nd Gen PHEV,SUV,112,

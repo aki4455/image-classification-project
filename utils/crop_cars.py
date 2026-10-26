@@ -89,6 +89,7 @@ def parse_args():
     ap.add_argument("mode", choices=["all", "largest"])
     ap.add_argument("--min-frac", type=float, default=None)
     ap.add_argument("--rival", type=float, default=0.5)
+    ap.add_argument("--only", type=Path, default=None)
     return ap.parse_args()
 
 
@@ -97,6 +98,9 @@ def main() -> None:
     model = detector.get_model()
     
     paths =sorted(p for p in args.src.rglob("*") if p.suffix.lower() in EXTS)
+    if args.only:
+        keep = set(args.only.read_text(encoding="utf-8").split())
+        paths = [p for p in paths if p.name in keep]
     detections = detect_all(model, paths)
     print(f"Images found {len(paths)} | reeadable: {len(detections)}")
     
@@ -128,7 +132,7 @@ def main() -> None:
         out_dir = args.dst / path.parent.relative_to(args.src)
         out_dir.mkdir(parents=True, exist_ok=True)
         for i, crop in enumerate(crop_boxes(img, boxes)):
-            cv2.imwrite(str(out_dir / f"{path.stem}_{i}.png"), crop)
+            cv2.imwrite(str(out_dir / f"{path.stem}_{i}.jpg"), crop)
             counts["saved"] += 1
     
     print(dict(counts))

@@ -12,3 +12,8 @@ wheels/
 # Models
 *.pt
 
+# Media files
+*.png
+*.jpg
+*.jpeg
+*.webp
