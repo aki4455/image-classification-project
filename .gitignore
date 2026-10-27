@@ -9,16 +9,16 @@ wheels/
 # Virtual environments
 .venv
 
-# Model weights (published separately as a GitHub Release / download link)
+# Model weights: ignored, except the ones the test-day pipeline loads (end of file)
 *.pt
 *.pth
 *.onnx
 *.safetensors
 *.ckpt
-weights/
+weights/*
 
-# Training outputs: checkpoints, plots, logs
-runs/
+# Training outputs: checkpoints, plots, logs; only the final run is committed (end of file)
+runs/*
 
 # Media files
 *.png
@@ -33,3 +33,13 @@ runs/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Committed exceptions (they must stay below the rules above): the weights the pipeline loads, and the
+# final run's training history and confusion matrices. best.pt is 111 MB, so it goes through Git LFS.
+!inference/colour_model.pt
+!weights/yolo11n.pt
+!runs/v2_two_head/
+runs/v2_two_head/*
+!runs/v2_two_head/best.pt
+!runs/v2_two_head/history.csv
+!runs/v2_two_head/confusion_*.png

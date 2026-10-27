@@ -8,6 +8,7 @@ Usage (from the codebase folder)
 
 Nothing here touches the internet: the detector and our weights are loaded from disk, and the
 ConvNeXt is built empty (no ImageNet download) before our own weights are loaded into it.
+The web UI (web/server.py) runs the same pipeline through predict_cars().
 """
 from __future__ import annotations
 
@@ -32,7 +33,8 @@ EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 CAR_MODEL_BRAND = "Chevrolet"   # the car-model head only knows our Uzbek Chevrolets
 
 
-def parse_args():
+def parse_args(argv: list[str] | None = None):
+    """argv=None reads the command line; parse_args([]) gives the defaults (used by the web UI)."""
     ap = argparse.ArgumentParser(description="Brand and colour of every car in a photo.")
     ap.add_argument("images", nargs="*", type=Path, help="photo files to process")
     ap.add_argument("--watch", type=Path, default=None, help="folder to watch for new photos")
@@ -44,8 +46,11 @@ def parse_args():
     ap.add_argument("--max-cars", type=int, default=8)
     ap.add_argument("--min-model-p", type=float, default=0.5,
                     help="name the car model only if the car-model head is at least this sure")
+    ap.add_argument("--flip", action=argparse.BooleanOptionalAction, default=True,
+                    help="also classify each car's mirror image and average the two answers "
+                         "(Car-1000 test: 96.7%% -> 97.1%%); --no-flip gives the original single pass")
     ap.add_argument("--out", type=Path, default=Path("outputs"), help="annotated copies go here")
-    return ap.parse_args()
+    return ap.parse_args(argv)
 
 
 def load_classifier(path: Path, device: torch.device):
@@ -75,15 +80,27 @@ def select_cars(boxes, confs, min_conf: float, min_rel: float, max_cars: int):
     return [(b, c) for b, c in cands if box_area(b) >= min_rel * biggest][:max_cars]
 
 
-@torch.no_grad()
-def classify(net, crops_bgr: list[np.ndarray], device, transform):
-    """crops (OpenCV, BGR) -> (brand probabilities, car-model probabilities or None).
-    Training images were read with PIL, which gives RGB, so we must convert BGR -> RGB here."""
-    x = torch.stack([transform(Image.fromarray(cv2.cvtColor(c, cv2.COLOR_BGR2RGB))) for c in crops_bgr])
-    out = net(x.to(device))
+def probabilities(out):
+    """network output -> (brand probabilities, car-model probabilities or None), on the CPU."""
     brand_logits, model_logits = out if isinstance(out, tuple) else (out, None)
     p_brand = brand_logits.float().softmax(1).cpu()
     p_model = model_logits.float().softmax(1).cpu() if model_logits is not None else None
+    return p_brand, p_model
+
+
+@torch.no_grad()
+def classify(net, crops_bgr: list[np.ndarray], device, transform, flip: bool = False):
+    """crops (OpenCV, BGR) -> (brand probabilities, car-model probabilities or None).
+    Training images were read with PIL, which gives RGB, so we must convert BGR -> RGB here.
+    flip=True also classifies the mirror image of every crop and averages the two answers
+    (training used random horizontal flips, so both directions are equally familiar)."""
+    x = torch.stack([transform(Image.fromarray(cv2.cvtColor(c, cv2.COLOR_BGR2RGB))) for c in crops_bgr])
+    x = x.to(device)
+    p_brand, p_model = probabilities(net(x))
+    if flip:
+        f_brand, f_model = probabilities(net(torch.flip(x, dims=[3])))
+        p_brand = (p_brand + f_brand) / 2
+        p_model = (p_model + f_model) / 2 if p_model is not None else None
     return p_brand, p_model
 
 
@@ -100,35 +117,65 @@ def draw(img, results, path: Path) -> None:
     cv2.imwrite(str(path), vis)
 
 
+def predict_cars(img, det_model, net, brands, car_models, device, transform, args) -> tuple[list[dict], dict]:
+    """photo (OpenCV, BGR) -> (one dict per reported car, biggest first; seconds spent per stage).
+    Shared by the command line below and the web UI (web/server.py)."""
+    seconds = {}
+    t = time.perf_counter()
+    r = det_model(img, classes=VEHICLE_CLASSES, conf=CONF, agnostic_nms=True, verbose=False)[0]
+    chosen = select_cars(r.boxes.xyxy.tolist(), r.boxes.conf.tolist(),
+                         args.min_conf, args.min_rel, args.max_cars)
+    results = []
+    for box, conf in chosen:
+        crop = crop_boxes(img, [box])   # same padding and minimum size as the training crops
+        if crop:
+            results.append({"box": box, "det_conf": conf, "crop": crop[0]})
+    seconds["detect"] = time.perf_counter() - t
+    if not results:
+        return results, seconds
+
+    t = time.perf_counter()
+    p_brand, p_model = classify(net, [res["crop"] for res in results], device, transform, args.flip)
+    for i, res in enumerate(results):
+        top = p_brand[i].topk(min(2, len(brands)))
+        res["brand"], res["p"] = brands[top.indices[0]], top.values[0].item()
+        res["alt"] = f"{brands[top.indices[1]]} {top.values[1].item():.2f}" if len(brands) > 1 else "-"
+        res["brand_probs"] = p_brand[i].tolist()
+        res["car_model"], res["p_model"], res["model_probs"] = None, 0.0, None
+        if p_model is not None and car_models and res["brand"] == CAR_MODEL_BRAND:
+            res["model_probs"] = p_model[i].tolist()
+            pm, im = p_model[i].max(0)
+            if pm.item() >= args.min_model_p:
+                res["car_model"], res["p_model"] = car_models[im].capitalize(), pm.item()
+    seconds["classify"] = time.perf_counter() - t
+
+    t = time.perf_counter()
+    for res in results:
+        res["colour"] = predict_colour(res["crop"])
+    seconds["colour"] = time.perf_counter() - t
+    return results, seconds
+
+
+def answer_line(results) -> str:
+    """What goes on the answer sheet: brand and colour of every car."""
+    return "; ".join(f"{res['brand']} {res['colour']}" for res in results) or "(no car found)"
+
+
+def models_line(results) -> str | None:
+    """The answer with the Chevrolet model added (not scored); None if no model was named."""
+    if not any(res["car_model"] for res in results):
+        return None
+    return "; ".join(f"{res['brand']} {res['car_model'] or ''} {res['colour']}".replace("  ", " ")
+                     for res in results)
+
+
 def process(path: Path, det_model, net, brands, car_models, device, transform, args) -> None:
     t0 = time.perf_counter()
     img = cv2.imread(str(path))
     if img is None:
         print(f"\n{path.name}: cannot read this file (iPhone HEIC? send it as a normal photo / JPEG)")
         return
-    r = det_model(img, classes=VEHICLE_CLASSES, conf=CONF, agnostic_nms=True, verbose=False)[0]
-    chosen = select_cars(r.boxes.xyxy.tolist(), r.boxes.conf.tolist(),
-                         args.min_conf, args.min_rel, args.max_cars)
-
-    results, crops = [], []
-    for box, conf in chosen:
-        crop = crop_boxes(img, [box])   # same padding and minimum size as the training crops
-        if crop:
-            crops.append(crop[0])
-            results.append({"box": box, "det_conf": conf})
-    if crops:
-        p_brand, p_model = classify(net, crops, device, transform)
-        for i, (res, crop) in enumerate(zip(results, crops)):
-            top = p_brand[i].topk(min(2, len(brands)))
-            res["brand"], res["p"] = brands[top.indices[0]], top.values[0].item()
-            res["alt"] = f"{brands[top.indices[1]]} {top.values[1].item():.2f}" if len(brands) > 1 else "-"
-            res["car_model"], res["p_model"] = None, 0.0
-            if p_model is not None and car_models and res["brand"] == CAR_MODEL_BRAND:
-                pm, im = p_model[i].max(0)
-                if pm.item() >= args.min_model_p:
-                    res["car_model"], res["p_model"] = car_models[im].capitalize(), pm.item()
-            res["colour"] = predict_colour(crop)
-
+    results, _ = predict_cars(img, det_model, net, brands, car_models, device, transform, args)
     seconds = time.perf_counter() - t0
     print(f"\n=== {path.name}  ({len(results)} car(s), {seconds:.1f}s)")
     for i, res in enumerate(results, 1):
@@ -136,10 +183,9 @@ def process(path: Path, det_model, net, brands, car_models, device, transform, a
         model_txt = f" ({res['car_model']} {res['p_model']:.2f})" if res["car_model"] else ""
         print(f"  {i}. {res['brand']}{model_txt}  p={res['p']:.2f} (next: {res['alt']}) | colour {res['colour']} "
               f"| det {res['det_conf']:.2f} | box {x2 - x1}x{y2 - y1}")
-    print("ANSWER:", "; ".join(f"{res['brand']} {res['colour']}" for res in results) or "(no car found)")
-    if any(res["car_model"] for res in results):
-        print("MODELS:", "; ".join(f"{res['brand']} {res['car_model'] or ''} {res['colour']}".replace("  ", " ")
-                                   for res in results))
+    print("ANSWER:", answer_line(results))
+    if models := models_line(results):
+        print("MODELS:", models)
     draw(img, results, args.out / f"{path.stem}_pred.jpg")
 
 
@@ -167,7 +213,8 @@ def main() -> None:
     net, brands, car_models = load_classifier(args.weights, device)
     transform = eval_transform()
     print(f"models loaded in {time.perf_counter() - t0:.1f}s on {device} | {len(brands)} brands"
-          + (f", {len(car_models)} car models" if car_models else ""))
+          + (f", {len(car_models)} car models" if car_models else "")
+          + (" | mirror averaging on" if args.flip else ""))
 
     def handle(p: Path) -> None:
         process(p, det_model, net, brands, car_models, device, transform, args)
