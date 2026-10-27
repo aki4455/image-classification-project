@@ -21,10 +21,10 @@ import numpy as np
 from inference.colour import COLOURS, DEFAULT_PARAMS, PARAMS_PATH, decide, pixel_summary, region_pixels
 
 GRID = {
-    "top": [0.30, 0.40], "bottom": [0.75, 0.85],
-    "s_min": [40, 60, 80], "v_dark": [40, 60],
-    "chroma_frac": [0.15, 0.25, 0.35, 0.50],
-    "v_white": [140, 160, 180], "v_black": [60, 80, 100],
+    "top": [0.25, 0.30, 0.40], "bottom": [0.70, 0.75, 0.85],
+    "s_min": [60, 80, 100, 120], "v_dark": [30, 45, 60],
+    "chroma_frac": [0.25, 0.35, 0.50],
+    "v_white": [110, 125, 140, 160], "v_black": [80, 100, 120],
 }
 
 

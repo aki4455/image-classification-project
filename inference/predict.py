@@ -39,7 +39,7 @@ def parse_args():
     ap.add_argument("--weights", type=Path, default=Path("runs/v2_two_head/best.pt"))
     ap.add_argument("--min-conf", type=float, default=0.4,
                     help="ignore detections the detector is less sure about than this")
-    ap.add_argument("--min-rel", type=float, default=0.1,
+    ap.add_argument("--min-rel", type=float, default=0.15,
                     help="ignore cars whose box area is below this share of the biggest car's box")
     ap.add_argument("--max-cars", type=int, default=8)
     ap.add_argument("--min-model-p", type=float, default=0.5,
