@@ -1,4 +1,7 @@
-"""Brand dataset: car crops on disk + brand labels.
+"""Car crops on disk + their labels: brand for every crop, car model only for our own crops.
+
+Every item is (crop_path, brand, car_model). car_model is None for Car-1000 crops: we only name
+models for the Uzbek Chevrolets we labelled ourselves (their folder name: cobalt, damas, ...).
 
 Car-1000 crops live in  <crops_root>/<model folder>/<original stem>_<i>.jpg
 brand_map.csv           says which brand each model folder is
@@ -47,8 +50,8 @@ def load_split(split_json) -> dict[str, str]:
     return split_of
 
 
-def car1000_items(crops_root, brand_map_csv, split_json) -> dict[str, list[tuple[Path, str]]]:
-    """{'train': [(crop_path, brand), ...], 'val': [...], 'test': [...]}"""
+def car1000_items(crops_root, brand_map_csv, split_json) -> dict[str, list[tuple[Path, str, None]]]:
+    """{'train': [(crop_path, brand, None), ...], 'val': [...], 'test': [...]}"""
     brand_of = load_brand_map(brand_map_csv)
     split_of = load_split(split_json)
     items = {"train": [], "val": [], "test": []}
@@ -62,14 +65,15 @@ def car1000_items(crops_root, brand_map_csv, split_json) -> dict[str, list[tuple
             if split is None:
                 missing += 1
                 continue
-            items[split].append((path, brand))
+            items[split].append((path, brand, None))
     if missing:
         print(f"warning: {missing} crops have no entry in the split file and were left out")
     return items
 
 
-def labelled_items(labels_csv, classes, val_frac=0.2, seed=0) -> dict[str, list[tuple[Path, str]]]:
-    """Our own crops labelled with label.py -> {'train': [...], 'val': [...]}.
+def labelled_items(labels_csv, classes, val_frac=0.2, seed=0) -> dict[str, list[tuple[Path, str, str]]]:
+    """Our own crops labelled with label.py -> {'train': [(path, brand, car_model), ...], 'val': [...]}.
+    The car model is the crop's folder name (cobalt, damas, ...).
 
     Split inside each model folder (cobalt, malibu, ...), so every model appears in both
     train and val. Skipped images and brands we don't train on are left out.
@@ -84,7 +88,8 @@ def labelled_items(labels_csv, classes, val_frac=0.2, seed=0) -> dict[str, list[
         if r["brand"] not in classes:
             unknown += 1
             continue
-        groups[Path(r["path"]).parent.name].append((Path(r["path"]), r["brand"]))
+        car_model = Path(r["path"]).parent.name.lower()
+        groups[car_model].append((Path(r["path"]), r["brand"], car_model))
     if unknown:
         print(f"warning: {unknown} labelled crops have a brand we don't train on and were left out")
 
@@ -97,6 +102,11 @@ def labelled_items(labels_csv, classes, val_frac=0.2, seed=0) -> dict[str, list[
         out["val"] += items[:n_val]
         out["train"] += items[n_val:]
     return out
+
+
+def car_model_list(*item_lists) -> list[str]:
+    """All car model names that appear in the given item lists, alphabetical (= class index)."""
+    return sorted({m for items in item_lists for _, _, m in items if m is not None})
 
 
 def train_transform():
@@ -126,18 +136,22 @@ def eval_transform():
     ])
 
 
-class CarCrops(Dataset):
-    """Turns a list of (path, brand) into (image tensor, class index) pairs, one at a time."""
+NO_LABEL = -100   # car-model target for crops whose model we don't know (all Car-1000 crops)
 
-    def __init__(self, items, classes, transform):
+
+class CarCrops(Dataset):
+    """Turns (path, brand, car_model) items into (image tensor, brand index, car-model index)."""
+
+    def __init__(self, items, brands, car_models, transform):
         self.items = items
-        self.index = {name: i for i, name in enumerate(classes)}
+        self.brand_index = {name: i for i, name in enumerate(brands)}
+        self.model_index = {name: i for i, name in enumerate(car_models)}
         self.transform = transform
 
     def __len__(self):
         return len(self.items)
 
     def __getitem__(self, i):
-        path, brand = self.items[i]
+        path, brand, car_model = self.items[i]
         img = Image.open(path).convert("RGB")
-        return self.transform(img), self.index[brand]
+        return self.transform(img), self.brand_index[brand], self.model_index.get(car_model, NO_LABEL)

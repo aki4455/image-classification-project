@@ -1,3 +1,14 @@
+"""Map Car-1000 model folders to the brand labels we train on, and pick a balanced sample.
+
+Outputs (written next to this script's working directory, NOT into the dataset):
+  brand_map.csv          one row per Car-1000 class: folder, brand (or empty), why it was excluded
+  selected_images.txt    filenames to crop: at most --cap per brand, spread evenly over its models
+
+Usage
+  uv run python -m preprocessing.build_brand_map "D:\\Car-1000-dataset" --cap 1000
+"""
+from __future__ import annotations
+
 import argparse
 import csv
 import json
@@ -5,24 +16,34 @@ import random
 from collections import defaultdict
 from pathlib import Path
 
-
+# Car-1000 automaker name (English part of name_from_old) -> the badge we predict.
+# Exact match only: sub-brands such as "Geely Galaxy" or "Changan Oushang" carry their own
+# badges, so they are NOT folded into the parent brand.
 BRANDS = {
     "BYD": "BYD", "Chery": "Chery", "Haval": "Haval", "Geely": "Geely", "Changan": "Changan",
     "Jetour": "Jetour", "Chevrolet": "Chevrolet", "BMW": "BMW", "Mercedes-Benz": "Mercedes",
-    "Zeekr":"Zeekr"
+    "Zeekr": "Zeekr", "Li Auto": "Li Auto", "Exeed": "Exeed", "Hongqi": "Hongqi",
+    "Leapmotor": "Leapmotor", "Kia": "Kia", "Hyundai": "Hyundai", "Toyota": "Toyota",
+    "Volkswagen": "Volkswagen", "Nissan": "Nissan",
+    "JAC": "JAC", "JAC Motors": "JAC", "JAC Refine": "JAC",   # Refine = JAC's MPV line, JAC badge
 }
-COMMERCIAL = {"Truck", "Van", "Bus"}  
+COMMERCIAL = {"Truck", "Van", "Bus"}  # vans, micro-trucks, pickups: rare on the test, odd shapes
 
-EXCLUDE_FOLDERS = {
-    "0271": "Chery Omoda: sold under its own OMODA badge in Uzbekistan",
+# Single classes whose badge differs from their maker's, set by hand.
+FOLDER_BRAND = {
+    "0271": "Omoda",   # made by Chery, but badged OMODA - the brief: "an Omoda is Omoda"
 }
+# Single classes we exclude by hand, with the reason.
+EXCLUDE_FOLDERS: dict[str, str] = {}
 
 
 def family(maker):
+    """'Geely Galaxy' -> 'Geely', 'Mercedes-Benz' -> 'Mercedes': which brand group a maker belongs to."""
     return maker.split()[0].split("-")[0]
 
 
 def parse(entry):
+    """'奇瑞_瑞虎7==Chery_Tiggo 7' -> ('Chery', 'Tiggo 7', 'SUV'). None if the name has no maker_model form."""
     english = entry["name_from_old"].split("==")[-1]
     if "_" not in english:
         return None
@@ -48,7 +69,10 @@ def main():
             continue
         maker, model, body = parsed
         n = len(list((args.root / "all_images" / folder).glob("*.jpg")))
-        if maker not in BRANDS:
+        if folder in FOLDER_BRAND:
+            brand, reason = FOLDER_BRAND[folder], ""
+            folders_by_brand[brand].append(folder)
+        elif maker not in BRANDS:
             brand, reason = "", "not a target brand"
         elif body in COMMERCIAL:
             brand, reason = "", f"commercial ({body})"
@@ -60,12 +84,16 @@ def main():
         rows.append({"folder": folder, "brand": brand, "maker": maker, "model": model,
                      "body": body, "images": n, "excluded_because": reason})
 
+    # utf-8-sig lets Excel open the file correctly. We keep the excluded sub-brands of our target
+    # makers in the table too, so every decision is visible and can be reviewed.
     with open("brand_map.csv", "w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())
         writer.writeheader()
-        writer.writerows(r for r in rows if family(r["maker"]) in BRANDS.values())
+        families = {family(m) for m in BRANDS}   # 'Li Auto' -> 'Li', 'Mercedes-Benz' -> 'Mercedes'
+        writer.writerows(r for r in rows if r["brand"] or family(r["maker"]) in families)
 
-   
+    # Round-robin over models, like dealing cards: one image from each model in turn,
+    # so a brand's sample covers all its models instead of filling up from the first few.
     rng = random.Random(args.seed)
     selected = []
     print(f"{'brand':10s} {'models':>6s} {'available':>9s} {'selected':>8s}")

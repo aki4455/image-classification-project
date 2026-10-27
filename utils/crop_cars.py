@@ -7,7 +7,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from detect import detector
+from utils.detect import detector
 
 
 VEHICLE_CLASSES = [2,5,7]

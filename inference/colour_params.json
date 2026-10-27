@@ -1,0 +1,9 @@
+{
+  "top": 0.3,
+  "bottom": 0.75,
+  "s_min": 80,
+  "v_dark": 60,
+  "chroma_frac": 0.35,
+  "v_white": 140,
+  "v_black": 100
+}
