@@ -25,6 +25,7 @@ from torchvision.transforms import v2
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
 IMG_SIZE = 224
+CAR_MODEL_BRAND = "Chevrolet"   # the only brand whose crops are labelled with a car model
 CROP_EXTS = {".jpg", ".png"}
 
 
@@ -73,7 +74,7 @@ def car1000_items(crops_root, brand_map_csv, split_json) -> dict[str, list[tuple
 
 def labelled_items(labels_csv, classes, val_frac=0.2, seed=0) -> dict[str, list[tuple[Path, str, str]]]:
     """Our own crops labelled with label.py -> {'train': [(path, brand, car_model), ...], 'val': [...]}.
-    The car model is the crop's folder name (cobalt, damas, ...).
+    For Chevrolets the car model is the crop's folder name (cobalt, damas, ...), otherwise None.
 
     Split inside each model folder (cobalt, malibu, ...), so every model appears in both
     train and val. Skipped images and brands we don't train on are left out.
@@ -88,8 +89,11 @@ def labelled_items(labels_csv, classes, val_frac=0.2, seed=0) -> dict[str, list[
         if r["brand"] not in classes:
             unknown += 1
             continue
-        car_model = Path(r["path"]).parent.name.lower()
-        groups[car_model].append((Path(r["path"]), r["brand"], car_model))
+        folder = Path(r["path"]).parent.name.lower()
+        # Chevrolet crops sit in model folders (cobalt, damas, ...); other brands' crops sit in
+        # brand folders (BYD, Leapmotor, ...), which are not car models.
+        car_model = folder if r["brand"] == CAR_MODEL_BRAND else None
+        groups[folder].append((Path(r["path"]), r["brand"], car_model))
     if unknown:
         print(f"warning: {unknown} labelled crops have a brand we don't train on and were left out")
 

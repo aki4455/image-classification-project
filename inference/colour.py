@@ -1,4 +1,12 @@
-"""Car colour without a neural network: read the paint pixels in HSV and apply a few rules.
+"""Car colour: HSV rules, optionally helped by a small learned model.
+
+Rules (always available): read the paint pixels in HSV and apply a few thresholds.
+Learned (if train/fit_colour_model.py chose it): ImageNet ResNet-18 features of the whole crop
++ one linear layer. It sees lighting, shadows and reflections, which a brightness rule cannot.
+fit_colour_model.py compares rules, learned and a hybrid by cross-validation and saves the winner
+to colour_model.pt; without that file, predict_colour() simply uses the rules.
+
+--- the rules ---
 
 Why rules: the brief's 8 colours are defined by hue (which colour), saturation (how colourful)
 and value (how bright). Our labelled crops have almost no rare colours (5 green, 1 yellow), so a
@@ -15,10 +23,16 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import torch
+from PIL import Image
+from torch import nn
+from torchvision.models import resnet18
 
 COLOURS = ["white", "black", "grey", "red", "blue", "green", "brown", "yellow"]
 RED, BLUE, GREEN, BROWN, YELLOW = (COLOURS.index(c) for c in ("red", "blue", "green", "brown", "yellow"))
 PARAMS_PATH = Path(__file__).with_name("colour_params.json")
+MODEL_PATH = Path(__file__).with_name("colour_model.pt")
+RULE_ONLY = {"red", "green", "yellow"}   # hybrid: rare saturated colours, where hue rules are reliable
 
 DEFAULT_PARAMS = {
     "top": 0.40, "bottom": 0.85,  # rows of the crop used as "paint": below the windows, above the road
@@ -82,6 +96,61 @@ def decide(summary: tuple[float, str | None, float], p: dict) -> str:
 _PARAMS = load_params()
 
 
-def predict_colour(crop_bgr: np.ndarray, p: dict | None = None) -> str:
+def rules_colour(crop_bgr: np.ndarray, p: dict | None = None) -> str:
     p = p or _PARAMS
     return decide(pixel_summary(region_pixels(crop_bgr, p["top"], p["bottom"]), p["s_min"], p["v_dark"]), p)
+
+
+# --- the learned model ---------------------------------------------------------------------
+
+def build_trunk(pretrained: bool) -> nn.Module:
+    """ResNet-18 without its ImageNet output layer: crop -> 512 numbers describing it."""
+    from torchvision.models import ResNet18_Weights
+    net = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
+    net.fc = nn.Identity()
+    return net.eval()
+
+
+@torch.no_grad()
+def crop_features(trunk, crops_bgr, device, batch: int = 64) -> torch.Tensor:
+    """Features of each crop, averaged with its mirror image (a car's colour doesn't change when flipped)."""
+    from data.dataset import eval_transform
+    tf = eval_transform()
+    out = []
+    for i in range(0, len(crops_bgr), batch):
+        x = torch.stack([tf(Image.fromarray(cv2.cvtColor(c, cv2.COLOR_BGR2RGB))) for c in crops_bgr[i:i + batch]])
+        x = x.to(device)
+        out.append(((trunk(x) + trunk(torch.flip(x, dims=[3]))) / 2).float().cpu())
+    return torch.cat(out)
+
+
+_LEARNED = None   # loaded on first use: (method, trunk, linear layer, mean, std, device)
+
+
+def _load_learned():
+    global _LEARNED
+    if _LEARNED is None:
+        if not MODEL_PATH.exists():
+            _LEARNED = ("rules",)
+        else:
+            ck = torch.load(MODEL_PATH, map_location="cpu")
+            if ck["method"] == "rules":
+                _LEARNED = ("rules",)
+            else:
+                device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+                trunk = build_trunk(pretrained=False)        # no download: weights come from our file
+                trunk.load_state_dict({k: v.float() if v.is_floating_point() else v for k, v in ck["trunk"].items()})
+                lin = nn.Linear(ck["linear"]["weight"].shape[1], len(COLOURS))
+                lin.load_state_dict(ck["linear"])
+                _LEARNED = (ck["method"], trunk.to(device), lin, ck["mean"], ck["std"], device)
+    return _LEARNED
+
+
+def predict_colour(crop_bgr: np.ndarray) -> str:
+    learned = _load_learned()
+    rule = rules_colour(crop_bgr)
+    if learned[0] == "rules" or (learned[0] == "hybrid" and rule in RULE_ONLY):
+        return rule
+    _, trunk, lin, mean, std, device = learned
+    f = crop_features(trunk, [crop_bgr], device)
+    return COLOURS[int(lin((f - mean) / std).argmax())]
